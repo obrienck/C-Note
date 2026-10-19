@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian: #0e0e10;
+  --color-canvas: #131315;
+  --color-panel: #1b1b1d;
+  --color-panel-hi: #201f21;
+  --color-elevated: #262628;
+  --color-hairline: #2a2a2d;
+  --color-etch: #353538;
+
+  --color-brass: #c8a97e;
+  --color-brass-hi: #e5c396;
+  --color-brass-lo: #8a7350;
+
+  --color-parchment: #e8e3d9;
+  --color-slate: #8e8d92;
+  --color-slate-dim: #626265;
+
+  --color-signal: #34d399;
+  --color-signal-deep: #10b981;
+  --color-signal-soft: #99d6bb;
+  --color-clip: #ef4444;
+
+  --font-serif: "Playfair Display Variable", Georgia, serif;
+  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --radius-sm: 3px;
+  --radius-md: 4px;
+
+  --animate-spin-33: spin 1.8s linear infinite;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-obsidian);
+  color: var(--color-parchment);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Etched hairline divider: dark groove with a faint highlight under it. */
+.etched {
+  height: 2px;
+  background: linear-gradient(to bottom, #0a0a0b 0 1px, #2c2c2f 1px 2px);
+}
+.etched-v {
+  width: 2px;
+  background: linear-gradient(to right, #0a0a0b 0 1px, #2c2c2f 1px 2px);
+}
+
+/* Brushed champagne brass surface. */
+.brushed-brass {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #e5c396 0%, #c8a97e 55%, #a88b61 100%);
+  color: #1a1408;
+}
+
+/* Sleeve depth: the album jacket as a physical gallery object. */
+.sleeve-shadow {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 2px 3px rgba(0, 0, 0, 0.5),
+    0 18px 40px -12px rgba(0, 0, 0, 0.8),
+    0 40px 80px -30px rgba(0, 0, 0, 0.7);
+}
+
+/* Film grain for archival plates and sleeves. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Range inputs styled as hardware faders. */
+input[type="range"].fader {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 14px;
+  cursor: pointer;
+}
+input[type="range"].fader::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--color-brass) 0 var(--fill, 50%),
+    #333336 var(--fill, 50%) 100%
+  );
+}
+input[type="range"].fader::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 14px;
+  margin-top: -5.5px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #f0d7ad, #b3966b);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.view-enter {
+  animation: view-enter 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@keyframes view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-33,
+  .view-enter {
+    animation: none;
+  }
+}
+
+/* macOS: the top bar doubles as the window's drag handle. */
+.drag-region {
+  -webkit-app-region: drag;
+}
+.drag-region button,
+.drag-region input,
+.drag-region a,
+.drag-region nav {
+  -webkit-app-region: no-drag;
+}
