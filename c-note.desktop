@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=C-Note
+Comment=A hi-fi desktop music player for collectors
+Exec=c-note %U
+Icon=c-note
+Terminal=false
+Type=Application
+Categories=Audio;AudioVideo;Player;
+StartupWMClass=C-Note

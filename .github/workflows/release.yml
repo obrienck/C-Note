@@ -1,0 +1,73 @@
+name: Release
+
+# Triggered by pushing a version tag, e.g.:
+#   npm run release -- patch      (or: git tag v1.0.0 && git push origin v1.0.0)
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            args: --mac
+          - os: windows-latest
+            args: --win
+          - os: ubuntu-latest
+            args: --linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check and build renderer/main
+        run: npm run build
+
+      - name: Build installer and publish to GitHub Releases
+        run: npx electron-builder ${{ matrix.args }} --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-arch:
+    # Waits for the release job so the GitHub Release (created by
+    # electron-builder's publish step) already exists to attach to.
+    needs: release
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    steps:
+      - name: Install build dependencies
+        run: pacman -Syu --noconfirm --needed git nodejs npm github-cli
+
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Build package (makepkg refuses to run as root)
+        # --syncdeps installs the PKGBUILD's depends/makedepends via sudo, so
+        # the dependency list lives only in the PKGBUILD.
+        run: |
+          useradd -m builder
+          echo 'builder ALL=(ALL) NOPASSWD: /usr/bin/pacman' > /etc/sudoers.d/builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+          su builder -c "cd '$GITHUB_WORKSPACE' && makepkg -f --syncdeps --noconfirm"
+
+      - name: Upload package to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" c-note-*-x86_64.pkg.tar.zst --clobber -R ${{ github.repository }}

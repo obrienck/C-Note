@@ -1,0 +1,49 @@
+appId: com.obrienck.cnote
+productName: C-Note
+directories:
+  buildResources: build
+  # Vite already owns dist/ for the renderer bundle.
+  output: release
+files:
+  - dist/**
+  - dist-electron/**
+  - '!**/*.map'
+  - package.json
+win:
+  executableName: C-Note
+  target:
+    - nsis
+    - zip
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  category: public.app-category.music
+  target:
+    - dmg
+    - zip
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSMusicFolderUsageDescription: C-Note reads your Music folder to index and play the albums you add.
+    - NSDocumentsFolderUsageDescription: C-Note reads music folders you add from Documents.
+    - NSDownloadsFolderUsageDescription: C-Note reads music folders you add from Downloads.
+    - NSRemovableVolumesUsageDescription: C-Note reads music libraries on external drives.
+  notarize: false
+dmg:
+  artifactName: ${name}-${version}.${ext}
+linux:
+  executableName: c-note
+  target:
+    - AppImage
+    - deb
+  maintainer: obrienck
+  category: Audio
+appImage:
+  artifactName: ${name}-${version}.${ext}
+npmRebuild: false
+publish:
+  provider: github
+  owner: obrienck
+  repo: C-Note
