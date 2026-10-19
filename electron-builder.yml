@@ -24,6 +24,11 @@ mac:
   target:
     - dmg
     - zip
+  # No Developer ID certificate yet: ad-hoc sign the whole bundle. Without a
+  # complete signature, Apple Silicon reports a downloaded app as "damaged";
+  # ad-hoc signed, it gets the standard unidentified-developer prompt instead.
+  identity: '-'
+  entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSMusicFolderUsageDescription: C-Note reads your Music folder to index and play the albums you add.
